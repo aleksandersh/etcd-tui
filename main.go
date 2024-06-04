@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"aleksandersh.dev/etcd-tui/cli"
-	"aleksandersh.dev/etcd-tui/data"
-	"aleksandersh.dev/etcd-tui/tui"
+	"github.com/aleksandersh/etcd-tui/cli"
+	"github.com/aleksandersh/etcd-tui/data"
+	"github.com/aleksandersh/etcd-tui/tui"
 	etcd "go.etcd.io/etcd/client/v3"
 )
 

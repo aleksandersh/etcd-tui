@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"aleksandersh.dev/etcd-tui/domain"
+	"github.com/aleksandersh/etcd-tui/domain"
 	etcd "go.etcd.io/etcd/client/v3"
 )
 

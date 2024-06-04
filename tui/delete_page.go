@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"aleksandersh.dev/etcd-tui/data"
-	"aleksandersh.dev/etcd-tui/domain"
+	"github.com/aleksandersh/etcd-tui/data"
+	"github.com/aleksandersh/etcd-tui/domain"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )

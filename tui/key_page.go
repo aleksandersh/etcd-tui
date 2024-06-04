@@ -3,7 +3,7 @@ package tui
 import (
 	"context"
 
-	"aleksandersh.dev/etcd-tui/domain"
+	"github.com/aleksandersh/etcd-tui/domain"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )

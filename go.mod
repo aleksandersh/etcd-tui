@@ -1,4 +1,4 @@
-module aleksandersh.dev/etcd-tui
+module github.com/aleksandersh/etcd-tui
 
 go 1.19
 
