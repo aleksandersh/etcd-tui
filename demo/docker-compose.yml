@@ -1,0 +1,18 @@
+name: etcd
+
+services:
+  etcd:
+    image: quay.io/coreos/etcd:latest
+    entrypoint: /usr/local/bin/etcd
+    command:
+      - '--name=etcd'
+      - '--initial-advertise-peer-urls=http://etcd:2380'
+      - '--listen-peer-urls=http://0.0.0.0:2380'
+      - '--advertise-client-urls=http://etcd:2379'
+      - '--listen-client-urls=http://0.0.0.0:2379'
+      - '--heartbeat-interval=250'
+      - '--election-timeout=1250'
+      - '--initial-cluster=etcd=http://etcd:2380'
+    ports:
+      - "2379:2379"
+      - "2380:2380"
