@@ -9,12 +9,12 @@ import (
 	"github.com/rivo/tview"
 )
 
-func RunApp(ctx context.Context, dataSource *data.EtcdDataSource, list *domain.EntityList) error {
+func RunApp(ctx context.Context, config *domain.Config, dataSource *data.EtcdDataSource, list *domain.EntityList) error {
 	app := tview.NewApplication()
 
 	pagesView := tview.NewPages()
 
-	controller := NewController(ctx, app, dataSource, pagesView)
+	controller := NewController(ctx, config, app, dataSource, pagesView)
 	controller.ShowItems(list)
 
 	app.SetRoot(pagesView, true)

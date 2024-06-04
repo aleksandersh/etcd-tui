@@ -7,6 +7,7 @@ import (
 
 	"github.com/aleksandersh/etcd-tui/cli"
 	"github.com/aleksandersh/etcd-tui/data"
+	"github.com/aleksandersh/etcd-tui/domain"
 	"github.com/aleksandersh/etcd-tui/tui"
 	etcd "go.etcd.io/etcd/client/v3"
 )
@@ -18,19 +19,19 @@ const (
 func main() {
 	args := cli.GetArgs()
 
-	config := etcd.Config{
+	etcdCfg := etcd.Config{
 		Endpoints:   args.Endpoints,
 		Username:    args.Username,
 		Password:    args.Password,
 		DialTimeout: connectionTimeOut,
 	}
-	cli, err := etcd.New(config)
+	cli, err := etcd.New(etcdCfg)
 	if err != nil {
-		log.Fatalf("failed to connect to etcd: %v, %v", config.Endpoints, err)
+		log.Fatalf("failed to connect to etcd: %v, %v", etcdCfg.Endpoints, err)
 	}
 	defer cli.Close()
 
-	log.Printf("etcd connected: %v", config.Endpoints)
+	log.Printf("etcd connected: %v", etcdCfg.Endpoints)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -40,7 +41,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to load keys: %v", err)
 	}
-	tui.RunApp(ctx, dataSource, list)
+	cfg := domain.NewConfig(args.Title)
+	tui.RunApp(ctx, cfg, dataSource, list)
 	if err != nil {
 		log.Fatalf("failed to start application: %v", err)
 	}

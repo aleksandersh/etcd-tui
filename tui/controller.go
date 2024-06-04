@@ -17,17 +17,18 @@ const (
 
 type Controller struct {
 	ctx        context.Context
+	config     *domain.Config
 	app        *tview.Application
 	dataSource *data.EtcdDataSource
 	pagesView  *tview.Pages
 }
 
-func NewController(ctx context.Context, app *tview.Application, dataSource *data.EtcdDataSource, pagesView *tview.Pages) *Controller {
-	return &Controller{ctx: ctx, app: app, dataSource: dataSource, pagesView: pagesView}
+func NewController(ctx context.Context, config *domain.Config, app *tview.Application, dataSource *data.EtcdDataSource, pagesView *tview.Pages) *Controller {
+	return &Controller{ctx: ctx, config: config, app: app, dataSource: dataSource, pagesView: pagesView}
 }
 
 func (c *Controller) ShowItems(enitityList *domain.EntityList) {
-	page := NewEntityListPage(c.ctx, c, c.dataSource, enitityList)
+	page := NewEntityListPage(c.ctx, c.config, c, c.dataSource, enitityList)
 	for _, page := range c.pagesView.GetPageNames(false) {
 		c.pagesView.RemovePage(page)
 	}

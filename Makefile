@@ -5,7 +5,7 @@ demo-etcd-docker-down:
 	docker compose -f ./demo/docker-compose.yml down
 
 demo-connect: build
-	./etcd-tui localhost:2379
+	./etcd-tui localhost:2379 --title "Demo etcd"
 
 build:
 	go build

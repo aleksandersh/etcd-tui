@@ -6,6 +6,7 @@ type Args struct {
 	Endpoints []string `arg:"positional,required"`
 	Username  string   `arg:"-u,--username"`
 	Password  string   `arg:"-p,--password"`
+	Title     string   `arg:"--title"`
 }
 
 func GetArgs() *Args {

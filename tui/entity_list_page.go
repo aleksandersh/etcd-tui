@@ -14,9 +14,9 @@ const (
 	runeD = 100
 )
 
-func NewEntityListPage(ctx context.Context, controller *Controller, dataSource *data.EtcdDataSource, list *domain.EntityList) tview.Primitive {
+func NewEntityListPage(ctx context.Context, config *domain.Config, controller *Controller, dataSource *data.EtcdDataSource, list *domain.EntityList) tview.Primitive {
 	helpView := createHelpView()
-	itemsView := createEntityListView(ctx, controller, list)
+	itemsView := createEntityListView(ctx, config, controller, list)
 	containerView := createContainerView(itemsView, helpView)
 
 	containerView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -52,12 +52,12 @@ func createContainerView(itemsView tview.Primitive, helpView tview.Primitive) *t
 	return gridView
 }
 
-func createEntityListView(ctx context.Context, controller *Controller, list *domain.EntityList) *tview.List {
+func createEntityListView(ctx context.Context, config *domain.Config, controller *Controller, list *domain.EntityList) *tview.List {
 	itemsView := tview.NewList()
 	itemsView.SetHighlightFullLine(true).
 		ShowSecondaryText(true).
 		SetWrapAround(false).
-		SetTitle("KV").
+		SetTitle(config.Title).
 		SetBorder(true)
 
 	for _, entity := range list.Entities {
