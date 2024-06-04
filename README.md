@@ -1,4 +1,4 @@
-# etcd terminal user interface
+# etcd terminal user interface client
 
 What is [etcd](https://etcd.io/)?
 > A distributed, reliable key-value store for the most critical data of a distributed system
@@ -10,17 +10,15 @@ What is [etcd](https://etcd.io/)?
 $ etcd-tui --version
 # ask for help
 $ etcd-tui --help
-```
-
-### Terminal user interface
-
-```bash
-$ etcd-tui localhost:2379 --user <user> --password <password>
+# launch user interface
+$ etcd-tui localhost:2379 --user user1 --password password1
 ```
 
 ## Demo
 
 ```bash
+# start the demo etcd server
 $ make demo-etcd-docker-up
+# connect to the server using etcd-tui
 $ make demo-connect
 ```
