@@ -3,6 +3,8 @@
 What is [etcd](https://etcd.io/)?
 > A distributed, reliable key-value store for the most critical data of a distributed system
 
+![tuiPack example](./demo/etc_tui_screenshot.png "Example")
+
 ## Installation
 
 #### Using go
