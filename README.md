@@ -3,6 +3,14 @@
 What is [etcd](https://etcd.io/)?
 > A distributed, reliable key-value store for the most critical data of a distributed system
 
+## Installation
+
+#### Using go
+
+```bash
+$ go install github.com/aleksandersh/etcd-tui@latest
+```
+
 ## Usage
 
 ```bash
