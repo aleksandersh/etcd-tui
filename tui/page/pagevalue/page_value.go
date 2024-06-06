@@ -1,4 +1,4 @@
-package tui
+package pagevalue
 
 import (
 	"context"
@@ -6,11 +6,12 @@ import (
 
 	"github.com/aleksandersh/etcd-tui/data"
 	"github.com/aleksandersh/etcd-tui/domain"
+	"github.com/aleksandersh/etcd-tui/tui/ui"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
-func NewValuePage(ctx context.Context, controller *Controller, dataSource *data.EtcdDataSource, enitity *domain.Entity) tview.Primitive {
+func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, enitity *domain.Entity) tview.Primitive {
 	helpView := tview.NewTextView().
 		SetText(" Press Enter to save the value\n Press Esc to go back")
 
@@ -46,7 +47,7 @@ func NewValuePage(ctx context.Context, controller *Controller, dataSource *data.
 	return gridView
 }
 
-func saveKeyValue(ctx context.Context, controller *Controller, dataSource *data.EtcdDataSource, key string, value string) {
+func saveKeyValue(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, key string, value string) {
 	if err := dataSource.SaveKeyValue(ctx, key, value); err != nil {
 		log.Fatalf("failed to save value: %v", err)
 	}

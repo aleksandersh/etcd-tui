@@ -1,4 +1,4 @@
-package tui
+package pagedelete
 
 import (
 	"context"
@@ -6,11 +6,12 @@ import (
 
 	"github.com/aleksandersh/etcd-tui/data"
 	"github.com/aleksandersh/etcd-tui/domain"
+	"github.com/aleksandersh/etcd-tui/tui/ui"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
-func NewDeletePage(ctx context.Context, controller *Controller, dataSource *data.EtcdDataSource, enitity *domain.Entity) tview.Primitive {
+func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, enitity *domain.Entity) tview.Primitive {
 	isKeyDeleted := false
 	modal := tview.NewModal().
 		SetText("Do you want to delete the key?\n " + enitity.Key).
@@ -39,7 +40,7 @@ func NewDeletePage(ctx context.Context, controller *Controller, dataSource *data
 	return modal
 }
 
-func deleteKey(ctx context.Context, controller *Controller, dataSource *data.EtcdDataSource, key string) {
+func deleteKey(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, key string) {
 	if err := dataSource.DeleteKey(ctx, key); err != nil {
 		log.Fatalf("failed to delete key: %v", err)
 	}

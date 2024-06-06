@@ -1,23 +1,16 @@
-package tui
+package pageentitylist
 
 import (
 	"context"
-	"log"
 
 	"github.com/aleksandersh/etcd-tui/data"
 	"github.com/aleksandersh/etcd-tui/domain"
+	"github.com/aleksandersh/etcd-tui/tui/ui"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
-const (
-	runeA = 97
-	runeD = 100
-	runeH = 104
-	runeR = 114
-)
-
-func NewEntityListPage(ctx context.Context, config *domain.Config, controller *Controller, dataSource *data.EtcdDataSource, list *domain.EntityList) tview.Primitive {
+func New(ctx context.Context, config *domain.Config, controller ui.Controller, dataSource *data.EtcdDataSource, list *domain.EntityList) tview.Primitive {
 	helpView := createHelpView()
 	itemsView := createEntityListView(ctx, config, controller, list)
 	containerView := createContainerView(itemsView, helpView)
@@ -29,18 +22,21 @@ func NewEntityListPage(ctx context.Context, config *domain.Config, controller *C
 		}
 		if event.Key() == tcell.KeyRune {
 			switch event.Rune() {
-			case runeA:
+			case ui.RuneA:
 				controller.ShowKeyPage()
 				return nil
-			case runeD:
+			case ui.RuneD:
 				idx := itemsView.GetCurrentItem()
 				if idx >= 0 {
 					controller.ShowDeletePage(&list.Entities[idx])
 				}
 				return nil
-			case runeR:
+			case ui.RuneR:
 				refreshing = true
-				go refresh(ctx, controller, dataSource)
+				helpView.SetText(" Refreshing...")
+				go refresh(ctx, controller, helpView, dataSource, &refreshing)
+			case ui.RuneH:
+				controller.ShowHelpPage()
 			}
 		}
 		return event
@@ -50,20 +46,22 @@ func NewEntityListPage(ctx context.Context, config *domain.Config, controller *C
 }
 
 func createHelpView() *tview.TextView {
-	helpView := tview.NewTextView().
-		SetText(" Press a to add a new key/value\n Press d to delete the key/value")
-	return helpView
+	return tview.NewTextView().
+		SetDynamicColors(true).
+		SetRegions(true).
+		SetMaxLines(1).
+		SetText(" Press h to show the help")
 }
 
 func createContainerView(itemsView tview.Primitive, helpView tview.Primitive) *tview.Grid {
 	gridView := tview.NewGrid().
-		SetRows(0, 3).
+		SetRows(0, 2).
 		AddItem(itemsView, 0, 0, 1, 1, 0, 0, true).
 		AddItem(helpView, 1, 0, 1, 1, 2, 0, false)
 	return gridView
 }
 
-func createEntityListView(ctx context.Context, config *domain.Config, controller *Controller, list *domain.EntityList) *tview.List {
+func createEntityListView(ctx context.Context, config *domain.Config, controller ui.Controller, list *domain.EntityList) *tview.List {
 	itemsView := tview.NewList()
 	itemsView.SetHighlightFullLine(true).
 		ShowSecondaryText(true).
@@ -81,10 +79,14 @@ func createEntityListView(ctx context.Context, config *domain.Config, controller
 	return itemsView
 }
 
-func refresh(ctx context.Context, controller *Controller, dataSource *data.EtcdDataSource) {
+func refresh(ctx context.Context, controller ui.Controller, statusView *tview.TextView, dataSource *data.EtcdDataSource, refreshing *bool) {
 	list, err := dataSource.GetEntityList(ctx)
 	if err != nil {
-		log.Fatalf("failed to get keys: %v", err)
+		controller.Enque(func() {
+			statusView.SetText(" [red]Failed to load entities[white], press r to refresh")
+			*refreshing = false
+		})
+		return
 	}
 	controller.Enque(func() { controller.ShowItems(list) })
 }

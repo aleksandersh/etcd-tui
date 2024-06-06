@@ -1,14 +1,15 @@
-package tui
+package pagekey
 
 import (
 	"context"
 
 	"github.com/aleksandersh/etcd-tui/domain"
+	"github.com/aleksandersh/etcd-tui/tui/ui"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
-func NewKeyPage(ctx context.Context, controller *Controller) tview.Primitive {
+func New(ctx context.Context, controller ui.Controller) tview.Primitive {
 	helpView := tview.NewTextView().
 		SetText(" Press Enter to enter a value\n Press Esc to go back")
 
