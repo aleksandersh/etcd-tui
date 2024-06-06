@@ -2,6 +2,7 @@ package tui
 
 import (
 	"context"
+	"log"
 
 	"github.com/aleksandersh/etcd-tui/data"
 	"github.com/aleksandersh/etcd-tui/domain"
@@ -12,6 +13,8 @@ import (
 const (
 	runeA = 97
 	runeD = 100
+	runeH = 104
+	runeR = 114
 )
 
 func NewEntityListPage(ctx context.Context, config *domain.Config, controller *Controller, dataSource *data.EtcdDataSource, list *domain.EntityList) tview.Primitive {
@@ -19,17 +22,25 @@ func NewEntityListPage(ctx context.Context, config *domain.Config, controller *C
 	itemsView := createEntityListView(ctx, config, controller, list)
 	containerView := createContainerView(itemsView, helpView)
 
+	refreshing := false
 	containerView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if refreshing {
+			return nil
+		}
 		if event.Key() == tcell.KeyRune {
-			if event.Rune() == runeA {
+			switch event.Rune() {
+			case runeA:
 				controller.ShowKeyPage()
 				return nil
-			} else if event.Rune() == runeD {
+			case runeD:
 				idx := itemsView.GetCurrentItem()
 				if idx >= 0 {
 					controller.ShowDeletePage(&list.Entities[idx])
 				}
 				return nil
+			case runeR:
+				refreshing = true
+				go refresh(ctx, controller, dataSource)
 			}
 		}
 		return event
@@ -68,4 +79,12 @@ func createEntityListView(ctx context.Context, config *domain.Config, controller
 	}
 
 	return itemsView
+}
+
+func refresh(ctx context.Context, controller *Controller, dataSource *data.EtcdDataSource) {
+	list, err := dataSource.GetEntityList(ctx)
+	if err != nil {
+		log.Fatalf("failed to get keys: %v", err)
+	}
+	controller.Enque(func() { controller.ShowItems(list) })
 }
