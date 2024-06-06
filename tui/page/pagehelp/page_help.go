@@ -14,6 +14,7 @@ func New(ctx context.Context, controller ui.Controller) tview.Primitive {
  Press a to add a new entity
  Press d to delete an entity
  Press r to refresh the entities
+
  Press Enter to choose an entity
  Press Esc to go back`)
 	textView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
