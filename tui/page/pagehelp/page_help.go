@@ -16,7 +16,9 @@ func New(ctx context.Context, controller ui.Controller) tview.Primitive {
  Press r to refresh the entities
 
  Press Enter to choose an entity
- Press Esc to go back`)
+ Press Esc to go back
+
+ Press Ctrl+C to exit`)
 	textView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEsc {
 			controller.CloseHelpPage()
