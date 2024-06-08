@@ -39,25 +39,30 @@ func (c *controller) ShowItems(enitityList *domain.EntityList, failedToLoad bool
 	for _, page := range c.pagesView.GetPageNames(false) {
 		c.pagesView.RemovePage(page)
 	}
+	c.restoreFocus()
 	c.pagesView.AddAndSwitchToPage(pageNameEntityList, page, true)
 }
 
 func (c *controller) ShowValuePage(enitity *domain.Entity) {
+	c.restoreFocus()
 	page := pagevalue.New(c.ctx, c, c.dataSource, enitity)
 	c.pagesView.AddAndSwitchToPage(pageNameValue, page, true)
 }
 
 func (c *controller) ShowKeyPage() {
+	c.restoreFocus()
 	page := pagekey.New(c.ctx, c)
 	c.pagesView.AddAndSwitchToPage(pageNameKey, page, true)
 }
 
 func (c *controller) ShowDeletePage(enitity *domain.Entity) {
+	c.restoreFocus()
 	page := pagedelete.New(c.ctx, c, c.dataSource, enitity)
 	c.pagesView.AddAndSwitchToPage(pageNameDelete, page, true)
 }
 
 func (c *controller) ShowHelpPage() {
+	c.restoreFocus()
 	page := pagehelp.New(c.ctx, c)
 	c.pagesView.AddAndSwitchToPage(pageNameHelp, page, true)
 }
@@ -82,6 +87,16 @@ func (c *controller) Focus(view tview.Primitive) {
 	c.app.SetFocus(view)
 }
 
+func (c *controller) Unfocus() {
+	c.app.SetFocus(nil)
+}
+
 func (c *controller) Enque(f func()) {
 	c.app.QueueUpdateDraw(f)
+}
+
+func (c *controller) restoreFocus() {
+	if c.app.GetFocus() == nil {
+		c.app.SetFocus(c.pagesView)
+	}
 }

@@ -16,5 +16,6 @@ type Controller interface {
 	CloseDeletePage()
 	CloseHelpPage()
 	Focus(view tview.Primitive)
+	Unfocus()
 	Enque(f func())
 }

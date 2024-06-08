@@ -33,7 +33,7 @@ func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDat
 		if event.Key() == tcell.KeyEnter {
 			if !vm.isValueSaving {
 				vm.isValueSaving = true
-				controller.Focus(statusView)
+				controller.Unfocus()
 				statusView.SetText(" Saving...")
 				go saveKeyValue(ctx, controller, dataSource, enitity.Key, textAreaView.GetText(), v, vm)
 				return nil
