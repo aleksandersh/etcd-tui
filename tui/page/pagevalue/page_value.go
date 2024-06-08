@@ -2,7 +2,6 @@ package pagevalue
 
 import (
 	"context"
-	"log"
 
 	"github.com/aleksandersh/etcd-tui/data"
 	"github.com/aleksandersh/etcd-tui/domain"
@@ -11,26 +10,43 @@ import (
 	"github.com/rivo/tview"
 )
 
+type view struct {
+	statusView   *tview.TextView
+	textAreaView *tview.TextArea
+}
+
+type viewmodel struct {
+	isValueSaving bool
+}
+
 func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, enitity *domain.Entity) tview.Primitive {
 	textAreaView := tview.NewTextArea()
 	textAreaView.SetBorder(true).SetTitle(" Enter the value ")
 	textAreaView.SetText(enitity.Value, true)
-	textAreaView.SetDisabled(false)
 
 	statusView := ui.CreateStatusTextView(" Press Enter to save the entry")
 
-	isTextSent := false
+	v := &view{statusView: statusView, textAreaView: textAreaView}
+	vm := &viewmodel{isValueSaving: false}
+
 	textAreaView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEnter {
-			if !isTextSent {
-				isTextSent = true
-				textAreaView.SetDisabled(false)
-				controller.Focus(textAreaView)
-				go saveKeyValue(ctx, controller, dataSource, enitity.Key, textAreaView.GetText())
+			if !vm.isValueSaving {
+				vm.isValueSaving = true
+				controller.Focus(statusView)
+				statusView.SetText(" Saving...")
+				go saveKeyValue(ctx, controller, dataSource, enitity.Key, textAreaView.GetText(), v, vm)
 				return nil
 			}
-		} else if event.Key() == tcell.KeyEsc {
-			if !isTextSent {
+		}
+		return event
+	})
+
+	grid := ui.CreateContainerGrid(textAreaView, statusView)
+
+	grid.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyEsc {
+			if !vm.isValueSaving {
 				controller.CloseValuePage()
 			}
 			return nil
@@ -38,16 +54,25 @@ func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDat
 		return event
 	})
 
-	return ui.CreateContainerGrid(textAreaView, statusView)
+	return grid
 }
 
-func saveKeyValue(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, key string, value string) {
+func saveKeyValue(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, key string, value string, v *view, vm *viewmodel) {
 	if err := dataSource.SaveKeyValue(ctx, key, value); err != nil {
-		log.Fatalf("failed to save value: %v", err)
+		controller.Enque(func() {
+			vm.isValueSaving = false
+			controller.Focus(v.textAreaView)
+			v.statusView.SetText(" [red]Failed to save the entry[white], press Enter to retry")
+		})
+		return
 	}
 	list, err := dataSource.GetEntityList(ctx)
 	if err != nil {
-		log.Fatalf("failed to get keys: %v", err)
+		controller.Enque(func() {
+			controller.ShowItems(nil, true)
+		})
 	}
-	controller.Enque(func() { controller.ShowItems(list) })
+	controller.Enque(func() {
+		controller.ShowItems(list, false)
+	})
 }

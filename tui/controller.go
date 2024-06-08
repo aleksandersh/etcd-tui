@@ -34,8 +34,8 @@ func NewController(ctx context.Context, config *domain.Config, app *tview.Applic
 	return &controller{ctx: ctx, config: config, app: app, dataSource: dataSource, pagesView: pagesView}
 }
 
-func (c *controller) ShowItems(enitityList *domain.EntityList) {
-	page := pageentitylist.New(c.ctx, c.config, c, c.dataSource, enitityList)
+func (c *controller) ShowItems(enitityList *domain.EntityList, failedToLoad bool) {
+	page := pageentitylist.New(c.ctx, c.config, c, c.dataSource, enitityList, failedToLoad)
 	for _, page := range c.pagesView.GetPageNames(false) {
 		c.pagesView.RemovePage(page)
 	}

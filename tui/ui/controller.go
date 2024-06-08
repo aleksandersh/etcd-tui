@@ -6,7 +6,7 @@ import (
 )
 
 type Controller interface {
-	ShowItems(enitityList *domain.EntityList)
+	ShowItems(enitityList *domain.EntityList, failedToLoad bool)
 	ShowValuePage(enitity *domain.Entity)
 	ShowKeyPage()
 	ShowDeletePage(enitity *domain.Entity)

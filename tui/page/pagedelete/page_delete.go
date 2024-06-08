@@ -47,11 +47,11 @@ func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDat
 
 func deleteKey(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, key string) {
 	if err := dataSource.DeleteKey(ctx, key); err != nil {
-		log.Fatalf("failed to delete key: %v", err)
+		log.Fatalf("failed to delete key: %v", err) // todo
 	}
 	list, err := dataSource.GetEntityList(ctx)
 	if err != nil {
-		log.Fatalf("failed to get keys: %v", err)
+		log.Fatalf("failed to get keys: %v", err) // todo
 	}
-	controller.Enque(func() { controller.ShowItems(list) })
+	controller.Enque(func() { controller.ShowItems(list, false) })
 }
