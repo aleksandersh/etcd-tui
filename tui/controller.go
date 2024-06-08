@@ -49,7 +49,7 @@ func (c *controller) ShowValuePage(enitity *domain.Entity) {
 
 func (c *controller) ShowKeyPage() {
 	page := pagekey.New(c.ctx, c)
-	c.pagesView.AddAndSwitchToPage(pageNameValue, page, true)
+	c.pagesView.AddAndSwitchToPage(pageNameKey, page, true)
 }
 
 func (c *controller) ShowDeletePage(enitity *domain.Entity) {

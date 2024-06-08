@@ -2,6 +2,7 @@ package pagedelete
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/aleksandersh/etcd-tui/data"
@@ -13,8 +14,12 @@ import (
 
 func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, enitity *domain.Entity) tview.Primitive {
 	isKeyDeleted := false
+	key := enitity.Key
+	if len(key) > 100 {
+		key = key[:97] + "..."
+	}
 	modal := tview.NewModal().
-		SetText("Do you want to delete the key?\n " + enitity.Key).
+		SetText(fmt.Sprintf("Do you want to delete the key?\n '%s'", key)).
 		AddButtons([]string{"Delete", "Cancel"}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if isKeyDeleted {

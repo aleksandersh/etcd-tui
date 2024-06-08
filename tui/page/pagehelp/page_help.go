@@ -10,15 +10,15 @@ import (
 
 func New(ctx context.Context, controller ui.Controller) tview.Primitive {
 	var textView = tview.NewTextView().
-		SetText(`
- Press a to add a new entity
+		SetText(` Press a to add a new entity
  Press d to delete an entity
  Press r to refresh the entities
 
  Press Enter to choose an entity
- Press Esc to go back
 
  Press Ctrl+C to exit`)
+	textView.SetBorder(true).SetTitle(" Help ")
+
 	textView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEsc {
 			controller.CloseHelpPage()
@@ -27,5 +27,8 @@ func New(ctx context.Context, controller ui.Controller) tview.Primitive {
 
 		return event
 	})
-	return textView
+
+	statusView := ui.CreateStatusTextView(" Press Esc to go back")
+
+	return ui.CreateContainerGrid(textView, statusView)
 }

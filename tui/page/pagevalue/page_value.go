@@ -12,21 +12,15 @@ import (
 )
 
 func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, enitity *domain.Entity) tview.Primitive {
-	helpView := tview.NewTextView().
-		SetText(" Press Enter to save the value\n Press Esc to go back")
-
 	textAreaView := tview.NewTextArea()
-	textAreaView.SetBorder(false).SetTitle(enitity.Key).SetBorderPadding(1, 1, 1, 1)
+	textAreaView.SetBorder(true).SetTitle(" Enter the value ")
 	textAreaView.SetText(enitity.Value, true)
 	textAreaView.SetDisabled(false)
 
-	gridView := tview.NewGrid().
-		SetRows(0, 3).
-		AddItem(textAreaView, 0, 0, 1, 1, 0, 0, true).
-		AddItem(helpView, 1, 0, 1, 1, 2, 0, false)
+	statusView := ui.CreateStatusTextView(" Press Enter to save the entry")
 
 	isTextSent := false
-	gridView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	textAreaView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEnter {
 			if !isTextSent {
 				isTextSent = true
@@ -44,7 +38,7 @@ func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDat
 		return event
 	})
 
-	return gridView
+	return ui.CreateContainerGrid(textAreaView, statusView)
 }
 
 func saveKeyValue(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, key string, value string) {

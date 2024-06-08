@@ -10,30 +10,30 @@ import (
 )
 
 func New(ctx context.Context, controller ui.Controller) tview.Primitive {
-	helpView := tview.NewTextView().
-		SetText(" Press Enter to enter a value\n Press Esc to go back")
-
 	textAreaView := tview.NewTextArea()
-	textAreaView.SetBorder(false).SetTitle("Enter a key").SetBorderPadding(1, 1, 1, 1)
+	textAreaView.SetBorder(true).SetTitle(" Enter the new key ")
 
-	gridView := tview.NewGrid().
-		SetRows(0, 3).
-		AddItem(textAreaView, 0, 0, 1, 1, 0, 0, true).
-		AddItem(helpView, 1, 0, 1, 1, 2, 0, false)
+	statusView := ui.CreateStatusTextView(" Press Enter to enter a value")
 
-	gridView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	textAreaView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEnter {
+			text := textAreaView.GetText()
+			if len(text) == 0 {
+				statusView.SetText(" [yellow]The key cannot be empty")
+				return nil
+			}
+
 			textAreaView.SetDisabled(false)
 			controller.Focus(textAreaView)
-			entity := domain.NewEntity(textAreaView.GetText(), "")
+			entity := domain.NewEntity(text, "")
 			controller.ShowValuePage(entity)
 			return nil
 		} else if event.Key() == tcell.KeyEsc {
-			controller.CloseValuePage()
+			controller.CloseKeyPage()
 			return nil
 		}
 		return event
 	})
 
-	return gridView
+	return ui.CreateContainerGrid(textAreaView, statusView)
 }

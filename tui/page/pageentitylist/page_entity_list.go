@@ -11,12 +11,11 @@ import (
 )
 
 func New(ctx context.Context, config *domain.Config, controller ui.Controller, dataSource *data.EtcdDataSource, list *domain.EntityList) tview.Primitive {
-	helpView := createHelpView()
 	itemsView := createEntityListView(ctx, config, controller, list)
-	containerView := createContainerView(itemsView, helpView)
+	statusView := ui.CreateStatusTextView(" Press h to show the help")
 
 	refreshing := false
-	containerView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	itemsView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if refreshing {
 			return nil
 		}
@@ -26,6 +25,9 @@ func New(ctx context.Context, config *domain.Config, controller ui.Controller, d
 				controller.ShowKeyPage()
 				return nil
 			case ui.RuneD:
+				if itemsView.GetItemCount() <= 0 {
+					return nil
+				}
 				idx := itemsView.GetCurrentItem()
 				if idx >= 0 {
 					controller.ShowDeletePage(&list.Entities[idx])
@@ -33,8 +35,8 @@ func New(ctx context.Context, config *domain.Config, controller ui.Controller, d
 				return nil
 			case ui.RuneR:
 				refreshing = true
-				helpView.SetText(" Refreshing...")
-				go refresh(ctx, controller, helpView, dataSource, &refreshing)
+				statusView.SetText(" Refreshing...")
+				go refresh(ctx, controller, statusView, dataSource, &refreshing)
 			case ui.RuneH:
 				controller.ShowHelpPage()
 			}
@@ -42,23 +44,7 @@ func New(ctx context.Context, config *domain.Config, controller ui.Controller, d
 		return event
 	})
 
-	return containerView
-}
-
-func createHelpView() *tview.TextView {
-	return tview.NewTextView().
-		SetDynamicColors(true).
-		SetRegions(true).
-		SetMaxLines(1).
-		SetText(" Press h to show the help")
-}
-
-func createContainerView(itemsView tview.Primitive, helpView tview.Primitive) *tview.Grid {
-	gridView := tview.NewGrid().
-		SetRows(0, 2).
-		AddItem(itemsView, 0, 0, 1, 1, 0, 0, true).
-		AddItem(helpView, 1, 0, 1, 1, 2, 0, false)
-	return gridView
+	return ui.CreateContainerGrid(itemsView, statusView)
 }
 
 func createEntityListView(ctx context.Context, config *domain.Config, controller ui.Controller, list *domain.EntityList) *tview.List {
@@ -66,7 +52,7 @@ func createEntityListView(ctx context.Context, config *domain.Config, controller
 	itemsView.SetHighlightFullLine(true).
 		ShowSecondaryText(true).
 		SetWrapAround(false).
-		SetTitle(config.Title).
+		SetTitle(" " + config.Title + " ").
 		SetBorder(true)
 
 	for _, entity := range list.Entities {
