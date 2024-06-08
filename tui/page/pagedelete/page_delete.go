@@ -25,7 +25,7 @@ func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDat
 		key = key[:97] + "..."
 	}
 	modal := tview.NewModal().
-		SetText(fmt.Sprintf("Do you want to delete the key?\n '%s'", key)).
+		SetText(fmt.Sprintf("Do you want to delete the key?\n'%s'", key)).
 		AddButtons([]string{"Delete", "Cancel"})
 
 	v := &view{modalView: modal}

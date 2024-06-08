@@ -3,14 +3,21 @@
 What is [etcd](https://etcd.io/)?
 > A distributed, reliable key-value store for the most critical data of a distributed system
 
-![tuiPack example](./demo/etc_tui_screenshot.png "Example")
+#### Current features
+
+- show a list of key/values
+- add a new key/value
+- delete a key/value
+- edit a value
+
+![tuiPack example](./demo/etcd_tui_screenshot.png "Example")
 
 ## Installation
 
 #### Using go
 
 ```bash
-$ go install github.com/aleksandersh/etcd-tui@latest
+go install github.com/aleksandersh/etcd-tui@latest
 ```
 
 ## Usage
@@ -27,8 +34,10 @@ $ etcd-tui localhost:2379 --user user1 --password password1
 ## Demo
 
 ```bash
-# start the demo etcd server
+# start the demo etcd server using docker
 $ make demo-etcd-docker-up
 # connect to the server using etcd-tui
 $ make demo-connect
+# stop demo docker
+$ make demo-etcd-docker-down
 ```
