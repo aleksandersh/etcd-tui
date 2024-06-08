@@ -6,14 +6,14 @@ import (
 )
 
 type Controller interface {
-	ShowItems(enitityList *domain.EntityList, failedToLoad bool)
+	ShowItems(enitityList *domain.EntityList)
 	ShowValuePage(enitity *domain.Entity)
 	ShowKeyPage()
 	ShowDeletePage(enitity *domain.Entity)
 	ShowHelpPage()
 	CloseKeyPage()
 	CloseValuePage()
-	CloseDeletePage()
+	CloseDeletePage(errorText string)
 	CloseHelpPage()
 	Focus(view tview.Primitive)
 	Unfocus()

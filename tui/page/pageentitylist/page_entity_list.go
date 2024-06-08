@@ -10,6 +10,12 @@ import (
 	"github.com/rivo/tview"
 )
 
+type Page struct {
+	v         *view
+	vm        *viewmodel
+	Primitive *tview.Grid
+}
+
 type view struct {
 	statusView *tview.TextView
 	itemsView  *tview.List
@@ -19,14 +25,14 @@ type viewmodel struct {
 	refreshing bool
 }
 
-func New(ctx context.Context, config *domain.Config, controller ui.Controller, dataSource *data.EtcdDataSource, list *domain.EntityList, failedToLoad bool) tview.Primitive {
+func New(ctx context.Context, config *domain.Config, controller ui.Controller, dataSource *data.EtcdDataSource, list *domain.EntityList) *Page {
 	itemsView := createEntityListView(ctx, config, controller, list)
 	statusView := ui.CreateStatusTextView(" Press h to show the help")
 
 	v := &view{statusView: statusView, itemsView: itemsView}
 	vm := &viewmodel{refreshing: false}
 
-	if failedToLoad {
+	if list == nil {
 		v.showRefreshingError()
 	}
 
@@ -50,7 +56,7 @@ func New(ctx context.Context, config *domain.Config, controller ui.Controller, d
 				return nil
 			case ui.RuneR:
 				vm.refreshing = true
-				statusView.SetText(" Refreshing...")
+				v.showStatusText("Refreshing...")
 				go refresh(ctx, controller, dataSource, v, vm)
 			case ui.RuneH:
 				controller.ShowHelpPage()
@@ -59,7 +65,12 @@ func New(ctx context.Context, config *domain.Config, controller ui.Controller, d
 		return event
 	})
 
-	return ui.CreateContainerGrid(itemsView, statusView)
+	p := ui.CreateContainerGrid(itemsView, statusView)
+	return &Page{v: v, vm: vm, Primitive: p}
+}
+
+func (p *Page) ShowStatusText(text string) {
+	p.v.showStatusText(text)
 }
 
 func createEntityListView(ctx context.Context, config *domain.Config, controller ui.Controller, list *domain.EntityList) *tview.List {
@@ -94,10 +105,14 @@ func refresh(ctx context.Context, controller ui.Controller, dataSource *data.Etc
 		return
 	}
 	controller.Enque(func() {
-		controller.ShowItems(list, false)
+		controller.ShowItems(list)
 	})
 }
 
 func (v *view) showRefreshingError() {
-	v.statusView.SetText(" [red]Failed to load entities[white], press r to refresh")
+	v.showStatusText("[red]Failed to load entities[white], press r to refresh")
+}
+
+func (v *view) showStatusText(text string) {
+	v.statusView.SetText(" " + text)
 }

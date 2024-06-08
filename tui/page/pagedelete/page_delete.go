@@ -3,7 +3,6 @@ package pagedelete
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/aleksandersh/etcd-tui/data"
 	"github.com/aleksandersh/etcd-tui/domain"
@@ -12,32 +11,45 @@ import (
 	"github.com/rivo/tview"
 )
 
+type view struct {
+	modalView *tview.Modal
+}
+
+type viewmodel struct {
+	deleting bool
+}
+
 func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, enitity *domain.Entity) tview.Primitive {
-	isKeyDeleted := false
 	key := enitity.Key
 	if len(key) > 100 {
 		key = key[:97] + "..."
 	}
 	modal := tview.NewModal().
 		SetText(fmt.Sprintf("Do you want to delete the key?\n '%s'", key)).
-		AddButtons([]string{"Delete", "Cancel"}).
-		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-			if isKeyDeleted {
-				return
-			}
-			if buttonIndex == 0 {
-				isKeyDeleted = true
-				go deleteKey(ctx, controller, dataSource, enitity.Key)
-			} else if buttonIndex == 1 {
-				controller.CloseDeletePage()
-			}
-		})
+		AddButtons([]string{"Delete", "Cancel"})
+
+	v := &view{modalView: modal}
+	vm := &viewmodel{deleting: false}
+
+	modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+		if vm.deleting {
+			return
+		}
+		controller.Unfocus()
+		if buttonIndex == 0 {
+			vm.deleting = true
+			go deleteKey(ctx, controller, dataSource, enitity.Key, v, vm)
+		} else if buttonIndex == 1 {
+			controller.CloseDeletePage("")
+		}
+	})
+
 	modal.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if isKeyDeleted {
+		if vm.deleting {
 			return event
 		}
 		if event.Key() == tcell.KeyEsc {
-			controller.CloseDeletePage()
+			controller.CloseDeletePage("")
 			return nil
 		}
 		return event
@@ -45,13 +57,18 @@ func New(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDat
 	return modal
 }
 
-func deleteKey(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, key string) {
+func deleteKey(ctx context.Context, controller ui.Controller, dataSource *data.EtcdDataSource, key string, v *view, vm *viewmodel) {
 	if err := dataSource.DeleteKey(ctx, key); err != nil {
-		log.Fatalf("failed to delete key: %v", err) // todo
+		controller.Enque(func() {
+			controller.CloseDeletePage("[red]Failed to delete the key")
+		})
+		return
 	}
+
 	list, err := dataSource.GetEntityList(ctx)
 	if err != nil {
-		log.Fatalf("failed to get keys: %v", err) // todo
+		controller.Enque(func() { controller.ShowItems(nil) })
+		return
 	}
-	controller.Enque(func() { controller.ShowItems(list, false) })
+	controller.Enque(func() { controller.ShowItems(list) })
 }

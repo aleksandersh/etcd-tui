@@ -68,11 +68,8 @@ func saveKeyValue(ctx context.Context, controller ui.Controller, dataSource *dat
 	}
 	list, err := dataSource.GetEntityList(ctx)
 	if err != nil {
-		controller.Enque(func() {
-			controller.ShowItems(nil, true)
-		})
+		controller.Enque(func() { controller.ShowItems(nil) })
+		return
 	}
-	controller.Enque(func() {
-		controller.ShowItems(list, false)
-	})
+	controller.Enque(func() { controller.ShowItems(list) })
 }

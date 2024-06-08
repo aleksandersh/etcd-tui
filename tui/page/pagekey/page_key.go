@@ -23,8 +23,6 @@ func New(ctx context.Context, controller ui.Controller) tview.Primitive {
 				return nil
 			}
 
-			textAreaView.SetDisabled(false)
-			controller.Focus(textAreaView)
 			entity := domain.NewEntity(text, "")
 			controller.ShowValuePage(entity)
 			return nil

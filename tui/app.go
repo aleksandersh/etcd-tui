@@ -19,7 +19,7 @@ func RunApp(ctx context.Context, config *domain.Config, dataSource *data.EtcdDat
 	pagesView := tview.NewPages()
 
 	controller := NewController(ctx, config, app, dataSource, pagesView)
-	controller.ShowItems(list, false)
+	controller.ShowItems(list)
 
 	app.SetRoot(pagesView, true)
 	if err := app.Run(); err != nil {

@@ -23,24 +23,26 @@ const (
 )
 
 type controller struct {
-	ctx        context.Context
-	config     *domain.Config
-	app        *tview.Application
-	dataSource *data.EtcdDataSource
-	pagesView  *tview.Pages
+	ctx            context.Context
+	config         *domain.Config
+	app            *tview.Application
+	dataSource     *data.EtcdDataSource
+	pagesView      *tview.Pages
+	entitylistPage *pageentitylist.Page
 }
 
 func NewController(ctx context.Context, config *domain.Config, app *tview.Application, dataSource *data.EtcdDataSource, pagesView *tview.Pages) ui.Controller {
 	return &controller{ctx: ctx, config: config, app: app, dataSource: dataSource, pagesView: pagesView}
 }
 
-func (c *controller) ShowItems(enitityList *domain.EntityList, failedToLoad bool) {
-	page := pageentitylist.New(c.ctx, c.config, c, c.dataSource, enitityList, failedToLoad)
+func (c *controller) ShowItems(enitityList *domain.EntityList) {
+	c.restoreFocus()
+	page := pageentitylist.New(c.ctx, c.config, c, c.dataSource, enitityList)
 	for _, page := range c.pagesView.GetPageNames(false) {
 		c.pagesView.RemovePage(page)
 	}
-	c.restoreFocus()
-	c.pagesView.AddAndSwitchToPage(pageNameEntityList, page, true)
+	c.entitylistPage = page
+	c.pagesView.AddAndSwitchToPage(pageNameEntityList, page.Primitive, true)
 }
 
 func (c *controller) ShowValuePage(enitity *domain.Entity) {
@@ -68,18 +70,25 @@ func (c *controller) ShowHelpPage() {
 }
 
 func (c *controller) CloseKeyPage() {
+	c.restoreFocus()
 	c.pagesView.RemovePage(pageNameKey)
 }
 
 func (c *controller) CloseValuePage() {
+	c.restoreFocus()
 	c.pagesView.RemovePage(pageNameValue)
 }
 
-func (c *controller) CloseDeletePage() {
+func (c *controller) CloseDeletePage(errorText string) {
+	c.restoreFocus()
+	if len(errorText) > 0 {
+		c.entitylistPage.ShowStatusText(errorText)
+	}
 	c.pagesView.RemovePage(pageNameDelete)
 }
 
 func (c *controller) CloseHelpPage() {
+	c.restoreFocus()
 	c.pagesView.RemovePage(pageNameHelp)
 }
 
