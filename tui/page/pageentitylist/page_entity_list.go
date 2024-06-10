@@ -26,7 +26,7 @@ type viewmodel struct {
 }
 
 func New(ctx context.Context, config *domain.Config, controller ui.Controller, dataSource *data.EtcdDataSource, list *domain.EntityList) *Page {
-	itemsView := createEntityListView(ctx, config, controller, list)
+	itemsView := createEntityListView(config, controller, list)
 	statusView := ui.CreateStatusTextView(" Press h to show the help")
 
 	v := &view{statusView: statusView, itemsView: itemsView}
@@ -73,13 +73,16 @@ func (p *Page) ShowStatusText(text string) {
 	p.v.showStatusText(text)
 }
 
-func createEntityListView(ctx context.Context, config *domain.Config, controller ui.Controller, list *domain.EntityList) *tview.List {
+func createEntityListView(config *domain.Config, controller ui.Controller, list *domain.EntityList) *tview.List {
 	itemsView := tview.NewList()
 	itemsView.SetHighlightFullLine(true).
 		ShowSecondaryText(true).
 		SetWrapAround(false).
-		SetTitle(" " + config.Title + " ").
 		SetBorder(true)
+
+	if len(config.Title) > 0 {
+		itemsView.SetTitle(" " + config.Title + " ")
+	}
 
 	if list == nil {
 		return itemsView
