@@ -5,9 +5,9 @@ What is [etcd](https://etcd.io/)?
 
 #### Current features
 
-- show a list of key/values
-- add a new key/value
-- delete a key/value
+- list key-values
+- add a new key-value
+- delete a key-value
 - edit a value
 
 ![tuiPack example](./demo/etcd_tui_screenshot.png "Example")
