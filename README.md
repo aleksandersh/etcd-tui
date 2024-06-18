@@ -14,7 +14,15 @@ What is [etcd](https://etcd.io/)?
 
 ## Installation
 
-#### Using go
+#### Homebrew tap
+
+```bash
+brew install aleksandersh/etcd-tui/etcd-tui
+```
+
+#### Go install
+
+Requires Go 1.22
 
 ```bash
 go install github.com/aleksandersh/etcd-tui@latest
